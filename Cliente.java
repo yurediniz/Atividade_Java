@@ -34,6 +34,6 @@ public class Cliente implements Serializable{
    
     @Override
     public String toString() {
-        return "CPF: " + cpf + " - Nome: " + nome + " - Idade: " + idade + " - Telefone: " + telefone;
+        return "\n - CPF: " + cpf + "\n - Nome: " + nome + "\n - Idade: " + idade + "\n - Telefone: " + telefone;
     }
 }

@@ -3,7 +3,6 @@ package br.uniesp.poo.ted04;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class CadastroCliente implements Serializable{
     private static final long serialVersionUID = 1L;
@@ -41,13 +40,14 @@ public class CadastroCliente implements Serializable{
             clientes.add(c);
             ManipulaArquivo.gravarArquivo(clientes, "clientes.dat");
             System.out.println("\t\tCliente Cadastrado Com Sucesso");
+            
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
     private void valideCpf(String cpf) throws Exception {
 
-        if(!(cpf.length() == 11) || !(isNumericInt(cpf))) {
+        if(!(cpf.length() == 11) || !(IsNumeric.numInt(cpf))) {
             throw new Exception("\n\t\tERRO: Número de CPF Inválido");
         }
 
@@ -63,7 +63,7 @@ public class CadastroCliente implements Serializable{
         } else if(nome.length() > 25) {
             throw new Exception("\t\tERRO: O nome deve ter menos que 25 caracteres, utilize abreviações");
 
-        } else if(isNumericChar(nome)) {
+        } else if(IsNumeric.numChar(nome)) {
             throw new Exception("\t\tERRO: O nome não pode conter números");
 
         } else if(nome.indexOf(" ") == - 1) {
@@ -77,30 +77,14 @@ public class CadastroCliente implements Serializable{
     private void validaIdade(String idade) throws Exception {
         if(idade.length() > 2) {
             throw new Exception("\t\tERRO: Idade máxima permitida para clientes é de 99 anos");
-        } else if (!(isNumericInt(idade))) {
+        } else if (!(IsNumeric.numInt(idade))) {
             throw new Exception("\t\tERRO: Digite apenas números");
         }
     }
 
     private void valideTelefone(String telefone) throws Exception {
-        if(!(telefone.length() == 11 || !(isNumericInt(idade)))) {
+        if(!(telefone.length() == 11 || !(IsNumeric.numInt(telefone)))) {
             throw new Exception("\t\tERRO: Número de telefone inválido");
         }
-    }
-
-    private boolean isNumericInt(String strNum) throws Exception {
-        Pattern patternInt = Pattern.compile("-?\\d+?");
-        if (strNum == null) {
-            return false;
-        }
-        return patternInt.matcher(strNum).matches();
-    }
-    private boolean isNumericChar(String nome) throws Exception {
-        for (int i = 0; i < nome.length(); i++) {
-            if (Character.isDigit(nome.charAt(i))) {
-                return true;
-            }
-        }
-        return false;
     }
 }

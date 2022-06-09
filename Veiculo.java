@@ -41,9 +41,12 @@ public class Veiculo implements Serializable {
         return this.motor;
     }
 
+
     public String getDisponivel() {
         return this.disponivel;
     }
 
-
+    public void setDisponivel(String disponivel) {
+        this.disponivel = disponivel;
+    }    
 }

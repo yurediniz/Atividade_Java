@@ -3,7 +3,6 @@ package br.uniesp.poo.ted04;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class CadastroVeiculos implements Serializable{
     private static final long serialVersionUID = 1L;
@@ -14,7 +13,6 @@ public class CadastroVeiculos implements Serializable{
     private String partida;
     private String motor;
     private String strNum;
-    private String disponivel = "N";
 
     ArrayList<Object> veiculos = ManipulaArquivo.lerArquivo("veiculos.dat");
     
@@ -24,9 +22,9 @@ public class CadastroVeiculos implements Serializable{
         
         try {
             System.out.println("\n\n\t\t--- CADASTRANDO CARRO---");
-            System.out.println("\n\n\t\t--- Informe os dados do veículo ---");
+            System.out.println("\n\n\t\t--- Informe os dados do Carro ---");
 
-            System.out.print("\t\tIdentificação (Somente números - ex.123): ");
+            System.out.print("\t\tIdentificação (Somente números(3 Dígitos) - ex.001): ");
             numIdent = leitor.nextLine().trim();
             verificaNumIdent(numIdent);
 
@@ -35,18 +33,14 @@ public class CadastroVeiculos implements Serializable{
             verificaDescricacao(descricao);
 
             System.out.print("\t\tQuantidade de passageiros(Min = 2 / Max = 7): ");
-            strNum = leitor.nextLine();
-            if(!isNumericInt(strNum)) {
-                throw new Exception("ERRO: Valor inválido, tente novamente");
-            }
-            qtdPassageiros = Integer.parseInt(strNum);
-            verificaQtdPassageiros(qtdPassageiros);
+            strNum = leitor.nextLine().trim();
+            qtdPassageiros = verificaQtdPassageiros(strNum);
 
             System.out.print("\t\tValor da diária: ");
             strNum = leitor.nextLine().trim();
             valorDiaria = verificaValorDiarias(strNum);
 
-            Carro c = new Carro(numIdent, descricao, qtdPassageiros, valorDiaria, disponivel);
+            Carro c = new Carro(numIdent, descricao, qtdPassageiros, valorDiaria);
             veiculos.add(c);
             ManipulaArquivo.gravarArquivo(veiculos, "veiculos.dat");
 
@@ -59,9 +53,9 @@ public class CadastroVeiculos implements Serializable{
 
         try {
             System.out.println("\n\n\t\t--- CADASTRANDO MOTO ---");
-            System.out.println("\n\n\t\t--- Informe os dados do veículo ---");
+            System.out.println("\n\n\t\t--- Informe os dados da Moto ---");
 
-            System.out.print("\t\tIdentificação (Somente números - ex.123): ");
+            System.out.print("\t\tIdentificação (Somente números(3 Dígitos) - ex.001): ");
             numIdent = leitor.nextLine().trim();
             verificaNumIdent(numIdent);
 
@@ -77,7 +71,8 @@ public class CadastroVeiculos implements Serializable{
             strNum = leitor.nextLine().trim();
             valorDiaria = verificaValorDiarias(strNum);
 
-            veiculos.add(new Moto(numIdent, descricao, partida, valorDiaria, disponivel));
+            Moto m = new Moto(numIdent, descricao, partida, valorDiaria);
+            veiculos.add(m);
             ManipulaArquivo.gravarArquivo(veiculos, "veiculos.dat");
 
             System.out.println("\n\t\tMoto cadastrada com sucesso");
@@ -90,9 +85,9 @@ public class CadastroVeiculos implements Serializable{
 
         try {
             System.out.println("\n\n\t\t--- CADASTRANDO NAVE ---");
-            System.out.println("\n\n\t\t--- Informe os dados do veículo ---");
+            System.out.println("\n\n\t\t--- Informe os dados da Nave ---");
 
-            System.out.print("\t\tIdentificação (Somente números - ex.123): ");
+            System.out.print("\t\tIdentificação (Somente números (3 Dígitos) - ex.001): ");
             numIdent = leitor.nextLine().trim();
             verificaNumIdent(numIdent);
 
@@ -101,7 +96,7 @@ public class CadastroVeiculos implements Serializable{
             descricao = descricao.toUpperCase();
             verificaDescricacao(descricao);
 
-            System.out.print("\t\tTipo de motor(Atômico(A) ou Elétrico(E) - (A/E): ");
+            System.out.print("\t\tTipo de motor - Atômico(A) ou Elétrico(E) - (A/E): ");
             motor = leitor.nextLine().toUpperCase().trim();
             verificaMotor(motor);
 
@@ -109,7 +104,8 @@ public class CadastroVeiculos implements Serializable{
             strNum = leitor.nextLine().trim();
             valorDiaria = verificaValorDiarias(strNum);
 
-            veiculos.add(new Nave(numIdent, descricao, motor, valorDiaria, disponivel));
+            Nave n = new Nave(numIdent, descricao, motor, valorDiaria);
+            veiculos.add(n);
             ManipulaArquivo.gravarArquivo(veiculos, "veiculos.dat");
 
             System.out.println("\n\t\tNave cadastrada com sucesso");
@@ -119,21 +115,33 @@ public class CadastroVeiculos implements Serializable{
     }
 
     private void verificaNumIdent(String numIdent) throws Exception {
-        if(!(numIdent.length() == 3)  || !isNumericInt(numIdent)){
-            throw new Exception("\n\t\tERRO: Número de identificação inválido, no máximo 3 dígitos e só pode conter números");
+        if(!(numIdent.length() == 3)  || !IsNumeric.numInt(numIdent)){
+            throw new Exception("\n\t\tERRO: Número de identificação inválido, Obrigatório ter apenas 3 dígitos e só pode conter números");
+        }
+
+        for(Object veiculo : veiculos) {
+            if(((Veiculo) veiculo).getIdentificacao().equals(numIdent)) {
+                throw new Exception("\n\t\tERRO: Veículo com Número de Identificação Já Cadastrado.");
+            }
         }
     }
 
     private void verificaDescricacao(String descricao) throws Exception {
-        if(descricao.length() < 5 || descricao.length()> 30) {
+        if(descricao.length() < 5 || descricao.length() > 30) {
             throw new Exception("\n\t\tERRO: A descrição deve ter no mínimo 6 e no máximo 30 caracteres");
         }
     }
-    private void verificaQtdPassageiros(int qtdPassageiros) throws Exception {
-        if(qtdPassageiros < 2 || qtdPassageiros > 7) {
+    private int verificaQtdPassageiros(String strNum) throws Exception {
+        if (!IsNumeric.numInt(strNum)) {
+            throw new Exception("\n\t\tERRO: Valor inválido, tente novamente");
+        }
+        int intNum = Integer.parseInt(strNum);
+        if(intNum < 2 || intNum > 7) {
             throw new Exception("\n\t\tERRO: Só aceitamos carros com capacidade minima de 2 e maxima de 7 passageiros");
         }
+        return intNum;
     }
+    
     private void verificaPartida(String partida) throws Exception {
         if(!(partida.length() == 1) && (!partida.equals("S") || !partida.equals("N"))) {
             throw new Exception("\n\t\tERRO: Valor inválido, digite apenas S ou N");
@@ -141,7 +149,7 @@ public class CadastroVeiculos implements Serializable{
     }
     
     private double verificaValorDiarias(String strNum) throws Exception {
-        if (!isNumericFloat(strNum)) {
+        if (!IsNumeric.numFloat(strNum)) {
             throw new Exception("\n\t\tERRO: Valor inválido, tente novamente");
         }
         double dbNum  = Double.parseDouble(strNum);
@@ -155,21 +163,5 @@ public class CadastroVeiculos implements Serializable{
         if(!(motor.length() == 1) && (!motor.equals("A") || !motor.equals("E"))) {
             throw new Exception("\n\t\tERRO: Valor inválido, digite apenas A ou E");
         }
-    }
-
-    private boolean isNumericFloat(String strNum) throws Exception {
-        Pattern patternFloat = Pattern.compile("-?\\d+(\\.\\d+)?");
-        if (strNum == null) {
-            throw new Exception("\n\t\tERRO: Valor inválido, tente novamente");
-        }
-        return patternFloat.matcher(strNum).matches();
-    }
-
-    private boolean isNumericInt(String strNum) throws Exception {
-        Pattern patternInt = Pattern.compile("-?\\d+?");
-        if (strNum == null) {
-            throw new Exception("\n\t\tERRO: Valor inválido, tente novamente");
-        }
-        return patternInt.matcher(strNum).matches();
     }
 }
